@@ -14,12 +14,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update the database when the switches are triggered
     document.querySelectorAll('.switch').forEach(function(switchElement) {
         switchElement.addEventListener('change', function() {
+            console.log('switch toggled')
             var data = {
                 'Username': 'user',
                 'Time_stamp': Date.now(),
-                'Gate': document.getElementById('gate').checked ? 1 : 0,
-                'Door': document.getElementById('door').checked ? 1 : 0,
-                'Window1': document.getElementById('window1').checked ? 1 : 0,
+                'Gate': document.getElementById('gateSwitch').checked ? 1 : 0,
+                'Door': document.getElementById('doorSwitch').checked ? 1 : 0,
+                'Window1': document.getElementById('window1Switch').checked ? 1 : 0,
                 'Alerts': 'No Alerts'
             };
             fetch('/update', {

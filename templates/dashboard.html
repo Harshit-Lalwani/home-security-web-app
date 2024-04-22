@@ -1,95 +1,82 @@
 <!DOCTYPE html>
-<!-- <script>
-    let Data = {{ data | tojson | safe }};
-</script> -->
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard</title>
-    <style>
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        .switch {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: relative;
-            cursor: pointer;
-            width: 60px;
-            height: 34px;
-            background-color: #ccc;
-            transition: .4s;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-        }
-
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px #2196F3;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        /* Rounded sliders */
-        .slider.round {
-            border-radius: 34px;
-        }
-
-        .slider.round:before {
-            border-radius: 50%;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Door Access Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+<style>
+    #userDoorChart{
+        max-width: 50vw;
+        min-height: 40vh;
+    }
+</style>
 <body>
-    <div class="container">
-        <h1>Dashboard</h1>
+    <canvas id="userDoorChart"></canvas>
 
-        <label class="switch">
-            <input type="checkbox" id="gate" >
-            <span class="slider round"></span>
-            Open Main Gate
-        </label>
+    <script>
+        async function fetchData() {
+            const response = await fetch('/get-csv-data');
+            const data = await response.text();
+            return data;
+        }
 
-        <label class="switch">
-            <input type="checkbox" id="door" >
-            <span class="slider round"></span>
-            Open Main Door
-        </label>
+        async function createChart() {
+            try {
+                const csvData = await fetchData();
+                console.log('CSV Data:', csvData);
+                
+                const rows = csvData.split('\n').slice(1);
+                console.log('CSV Rows:', rows);
+                
+                let usernames = [];
+                let doorCounts = [];
+                rows.forEach(row => {
+                    const columns = row.split(',');
+                    const username = columns[0];
+                    const door = parseInt(columns[3]);
+                    console.log('Username:', username, 'Door:', door);
+                    if (!usernames.includes(username)) {
+                        usernames.push(username);
+                        doorCounts.push(door);
+                    } else {
+                        const index = usernames.indexOf(username);
+                        doorCounts[index] += door;
+                    }
+                });
 
-        <label class="switch">
-            <input type="checkbox" id="window1" >
-            <span class="slider round"></span>
-            Open Window
-        </label>
-    </div>
-    <script src="static/js/script.js"></script>  <!-- Only include the script here -->
+                console.log('Usernames:', usernames);
+                console.log('Door Counts:', doorCounts);
+
+                const ctx = document.getElementById('userDoorChart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: usernames,
+                        datasets: [{
+                            label: 'Number of Times Door is Opened',
+                            data: doorCounts,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        createChart();
+    </script>
 </body>
 </html>

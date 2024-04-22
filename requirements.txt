@@ -1,3 +1,7 @@
-Flask==1.1.2
-Werkzeug==1.0.1
+Werkzeug
 jinja2
+Flask
+Flask-APScheduler
+Flask-SQLAlchemy
+pandas
+plyer
