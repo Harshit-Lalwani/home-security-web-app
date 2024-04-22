@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #0d6efd;
+            color: #fff;
+            /* padding: 20px; */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .design_nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-top: 8vh;
+            padding: 1vh;
+        }
+
+        .design_nav a {
+            color: #fff;
+            font-size: 2vw;
+            text-decoration: none;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            /* margin-right: 20px; */
+            border-radius: 5px;
+        }
+
+        .design_nav a:hover {
+            background-color: #0b5ed7;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 5px;
+            padding: 10px;
+            top: 50px; /* adjust the distance from the dropdown to the header */
+            right: 20px; /* adjust the distance from the dropdown to the right edge */
+        }
+
+        .dropdown-content a {
+            font-size: 16px;
+            color: black;
+            padding: 8px 12px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .home-text {
+            text-align: center;
+            margin-top: 15vh;
+        }
+
+        .home-text h2 {
+            font-size: 2rem;
+            color: #0d6efd;
+        }
+
+        .home-text p {
+            font-family: cursive;
+            color: #555;
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .grid-item {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .control {
+            text-align: center;
+        }
+
+        .control h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        #alerts {
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .top:hover {
+            background-color: #0b5ed7;
+        }
+
+    </style>
+</head>
+
+<body>
+    <header class="header">
+
+        <nav class="design_nav" style="position: fixed; background-color: #0b5ed7; width: 100%;">
+            <!-- <img src="sitelogo.jpeg" alt="none"> -->
+            <a href="#home">Home</a>
+            <a href="#control">Control buttons</a>
+            <a href="#alerts">Alerts</a>
+        
+
+        <div class="dropdown">
+            <button class="dropbtn" style="font-size: 2vw;">{{ session['username'] }} <i class='bx bx-caret-down'></i></button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </nav>
+    </header>
+
+    <section id="home">
+        <div class="home-text">
+            <h2>Automated Home Security System</h2>
+
+            <p>Welcome to our state-of-the-art home security system platform, where peace of mind meets cutting-edge technology. Safeguard your home and loved ones effortlessly by harnessing the power of our intuitive interface. With seamless integration and easy setup, protect your property with confidence. Efficiently monitor your surroundings with our advanced surveillance features, providing real-time updates and alerts for any suspicious activity.</p>
+        </div>
+
+        <img src="{{ url_for('static', filename='img/front.png') }}" alt="" width="400px">
+        <img src="{{ url_for('static', filename='img/security.png') }}" alt="" width="400px">
+        <img src="{{ url_for('static', filename='img/about us.png') }}" alt="" width="400px">
+    </section>
+
+    <h1 id="control">Control Buttons</h1>
+
+    <div class="grid-container">
+        <div class="grid-item">
+            <div class="control">
+                <h2>Gate Control</h2>
+                <label class="switch">
+                    <input type="checkbox" id="gateSwitch">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        <div class="grid-item">
+            <div class="control">
+                <h2>Window Control</h2>
+                <label class="switch">
+                    <input type="checkbox" id="windowSwitch">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        <div class="grid-item">
+            <div class="control">
+                <h2>Door Control</h2>
+                <label class="switch">
+                    <input type="checkbox" id="doorSwitch">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <h1 id="alerts">Alerts</h1>
+    <a href="#" class="top"> <i class='bx bx-up-arrow-alt'></i></a>
+<script src="../static/js/script.js"></script>
+</body>
+
+</html>

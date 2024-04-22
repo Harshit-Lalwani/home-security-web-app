@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Register Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            margin-top: 100px;
+        }
+        .button {
+            padding: 20px 40px; /* Increased padding */
+            font-size: 24px; /* Increased font size */
+            border: none;
+            cursor: pointer;
+            border-radius: 30px; /* Increased border radius */
+            margin: 0 10px;
+            transition: all 0.3s ease; /* Added transition effect */
+        }
+        .button:hover {
+            transform: scale(1.05); /* Scale up on hover */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Added shadow on hover */
+        }
+        #loginBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #registerBtn {
+            background-color: #008CBA;
+            color: white;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome to Our Platform</h2>
+        <p>Please select an option:</p>
+        <button id="loginBtn" class="button" onclick="window.location.href='log'">Login</button>
+        <button id="registerBtn" class="button" onclick="window.location.href='sign'">Register</button>
+    </div>
+</body>
+</html>

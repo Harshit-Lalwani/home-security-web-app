@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            max-width: 800px; /* Limiting maximum width */
+            margin: auto; /* Centering the table */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adding a shadow effect */
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <table id="dataTable">
+        <thead>
+            <tr></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function fetchData() {
+            const response = await fetch('/get-csv-data');
+            const data = await response.text();
+            return data;
+        }
+
+        async function createTable() {
+            const csvData = await fetchData();
+            const rows = csvData.split('\n');
+            const table = document.getElementById('dataTable');
+
+            // Populate table header
+            const headerRow = table.rows[0];
+            const headerColumns = rows[0].split(',');
+            headerColumns.forEach(column => {
+                const th = document.createElement('th');
+                th.textContent = column.trim();
+                headerRow.appendChild(th);
+            });
+
+            // Populate table data
+            for (let i = 1; i < rows.length; i++) {
+                const row = table.insertRow();
+                const columns = rows[i].split(',');
+
+                columns.forEach((column, index) => {
+                    const cell = row.insertCell();
+                    // Convert 1 to "ON" and 0 to "OFF", keep Time_stamp unchanged
+                    const cellData = index === 1 ? column.trim() : (column.trim() === '1' ? 'ON' : (column.trim() === '0' ? 'OFF' : column.trim()));
+                    cell.textContent = cellData;
+                });
+            }
+        }
+
+        createTable();
+    </script>
+</body>
+</html>

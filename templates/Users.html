@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 80%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 20px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            border-bottom: 2px solid #ddd;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        input[type="checkbox"] {
+            transform: scale(1.5);
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Status</h1>
+
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function fetchData() {
+            const response = await fetch('/get-csv-users');
+            const data = await response.text();
+            return data;
+        }
+
+        async function createTable() {
+            const csvData = await fetchData();
+            const rows = csvData.split('\n').slice(1);
+            const table = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+
+            rows.forEach(rowData => {
+                const [username, password, status] = rowData.split(',');
+                const row = table.insertRow();
+                const cellUsername = row.insertCell(0);
+                const cellStatus = row.insertCell(1);
+                cellUsername.textContent = username.trim();
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = status.trim() === '1';
+                checkbox.addEventListener('change', () => {
+                    const updatedStatus = checkbox.checked ? '1' : '0';
+                    const updatedRowData = `${username.trim()},${password.trim()},${updatedStatus}`;
+                    const index = Array.from(table.rows).indexOf(row);
+                    updateCSVRow(index+1, updatedRowData);
+                });
+                cellStatus.appendChild(checkbox);
+            });
+        }
+
+        async function updateCSVRow(index, rowData) {
+            console.log('Updating CSV row:', index, rowData);
+            
+            const response = await fetch('/update-csv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ index, rowData })
+            });
+
+            if (response.ok) {
+                console.log('CSV row updated successfully');
+            } else {
+                console.error('Failed to update CSV row:', response.status);
+            }
+        }
+
+        createTable();
+    </script>
+</body>
+</html>
