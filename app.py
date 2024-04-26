@@ -282,7 +282,7 @@ def get_csv_data():
 
 @app.route('/log')
 def log():
-    return render_template('login.html')
+    return render_template('data.html')
 @app.route('/sign')
 def sign():
     return render_template('register.html')
