@@ -223,42 +223,97 @@
         <img src="{{ url_for('static', filename='img/security.png') }}" alt="" width="400px">
         <img src="{{ url_for('static', filename='img/about us.png') }}" alt="" width="400px">
     </section>
+    <h1>Welcome to Browser Notifications Demo</h1>
+    <p>This website demonstrates browser notifications.</p>
+    <button onclick="sendNotification()">Send Notification</button>
 
-    <h1 id="control">Control Buttons</h1>
 
-    <div class="grid-container">
-        <div class="grid-item">
-            <div class="control">
-                <h2>Gate Control</h2>
-                <label class="switch">
-                    <input type="checkbox" id="gateSwitch">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-        <div class="grid-item">
-            <div class="control">
-                <h2>Window Control</h2>
-                <label class="switch">
-                    <input type="checkbox" id="windowSwitch">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-        <div class="grid-item">
-            <div class="control">
-                <h2>Door Control</h2>
-                <label class="switch">
-                    <input type="checkbox" id="doorSwitch">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
+    <button id="control" onclick="window.location.href='control'" style="background-color: #0d6efd; color: #fff; border: none; border-radius: 5px; padding: 10px 20px; margin-left: 40vw; font-size: 1.5rem; cursor: pointer; transition: background-color 0.3s ease; margin: 50px 0;">Control Buttons</button>
 
     <h1 id="alerts">Alerts</h1>
+    <div id="alerts-content"></div>
+    
     <a href="#" class="top"> <i class='bx bx-up-arrow-alt'></i></a>
 <script src="../static/js/script.js"></script>
 </body>
+<script>
+function requestPermission() {
+            Notification.requestPermission().then(function(permission) {
+                if (permission === 'granted') {
+                    console.log('Notification permission granted.');
+                } else {
+                    console.log('Notification permission denied.');
+                }
+            });
+        }
+        function showNotification(title, body) {
+            if (Notification.permission === 'granted') {
+                var notification = new Notification(title, { body: body });
+            } else {
+                console.log('Notification permission not granted.');
+                // Request permission again
+                requestPermission();
+            }
+        }
 
+        function sendNotification(title,body) {
+            fetch('/send_notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    body: body
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Notification sent successfully');
+                    // Display notification after sending successfully
+                    showNotification(title, body);
+                } else {
+                    console.error('Failed to send notification');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending notification:', error);
+            });
+        }
+
+window.onload = function() {
+            requestPermission();
+        };
+
+    async function fetchGlobalValue() {
+    const response = await fetch('/get-global-value');
+    const data = await response.json();
+    return data.value;
+}
+
+async function displayGlobalValue() {
+    const globalValue = await fetchGlobalValue();
+    console.log('Global Value:', globalValue);
+    if (globalValue !== 0) {
+        const alertsMap = {
+            1: 'Window break',
+            2: 'Fence break',
+            3: 'Lock break',
+            4: 'Manual Override',
+            5: 'Someone at the gate'
+        };
+        const alertsContainer = document.getElementById('alerts-content');
+        const newRow = document.createElement('div');
+        newRow.classList.add('alert-row');
+        const newCell = document.createElement('div');
+        newCell.classList.add('alert-message');
+        newCell.textContent = alertsMap[globalValue];
+        newRow.appendChild(newCell);
+        alertsContainer.appendChild(newRow);
+        sendNotification(alertsMap[globalValue], `Alert: ${alertsMap[globalValue]}`);
+    }
+}
+setInterval(displayGlobalValue, 500);
+
+</script>
 </html>

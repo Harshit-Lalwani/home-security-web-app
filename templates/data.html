@@ -48,41 +48,61 @@
     </table>
 
     <script>
-        async function fetchData() {
-            const response = await fetch('/get-csv-data');
-            const data = await response.text();
-            return data;
-        }
+       async function fetchData() {
+    const response = await fetch('/get-csv-data');
+    const data = await response.text();
+    return data;
+}
 
-        async function createTable() {
-            const csvData = await fetchData();
-            const rows = csvData.split('\n');
-            const table = document.getElementById('dataTable');
+async function createTable() {
+    const csvData = await fetchData();
+    const rows = csvData.split('\n');
+    const table = document.getElementById('dataTable');
 
-            // Populate table header
-            const headerRow = table.rows[0];
-            const headerColumns = rows[0].split(',');
-            headerColumns.forEach(column => {
-                const th = document.createElement('th');
-                th.textContent = column.trim();
-                headerRow.appendChild(th);
-            });
+    // Populate table header
+    const headerRow = table.rows[0];
+    const headerColumns = rows[0].split(',');
+    headerColumns.forEach(column => {
+        const th = document.createElement('th');
+        th.textContent = column.trim();
+        headerRow.appendChild(th);
+    });
 
-            // Populate table data
-            for (let i = 1; i < rows.length; i++) {
-                const row = table.insertRow();
-                const columns = rows[i].split(',');
+    // Populate table data
+    for (let i = 1; i < rows.length; i++) {
+        const row = table.insertRow();
+        const columns = rows[i].split(',');
 
-                columns.forEach((column, index) => {
-                    const cell = row.insertCell();
-                    // Convert 1 to "ON" and 0 to "OFF", keep Time_stamp unchanged
-                    const cellData = index === 1 ? column.trim() : (column.trim() === '1' ? 'ON' : (column.trim() === '0' ? 'OFF' : column.trim()));
-                    cell.textContent = cellData;
-                });
+        columns.forEach((column, index) => {
+            const cell = row.insertCell();
+            let cellData = column.trim();
+            if (index === 1) { // Time_stamp column
+                // Convert Unix timestamp to date format
+                const timestamp = parseInt(cellData);
+                const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
+                cellData = date.toLocaleString(); // Format date and time
+            } else if (index >= 2 && index <= 4) { // Gate, Door, Window1 columns
+                // Convert 1 to "Open" and 0 to "Close"
+                cellData = cellData === '1' ? 'Open' : 'Close';
+            } else if (index === 5) { // Alerts column
+                // Decode alert codes
+                const alertMap = {
+                    '0': 'No alert',
+                    '1': 'Window break',
+                    '2': 'Fence break',
+                    '3': 'Lock break',
+                    '4': 'Manual Override',
+                    '5': 'Someones at the gate'
+                };
+                cellData = alertMap[cellData] || 'Unknown';
             }
-        }
+            cell.textContent = cellData;
+        });
+    }
+}
 
-        createTable();
+createTable();
+
     </script>
 </body>
 </html>

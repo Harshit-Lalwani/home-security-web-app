@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Door Access Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #userDoorChart {
+            max-width: 50%;
+            min-width: 30vh;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 20px;">
+    <canvas id="userDoorChart"></canvas>
+</div>
+<div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+</div><div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+</div><div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+</div> <div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+</div><div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+</div><div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/charts/6?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+</div><div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/charts/7?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+</div><div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/charts/8?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+</div><div style="margin-bottom: 20px;">
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2508698/widgets/846118"></iframe>
+</div>
+
+    <script>
+        async function fetchData() {
+            const response = await fetch('/get-csv-data');
+            const data = await response.text();
+            return data;
+        }
+
+        async function createChart() {
+            try {
+                const csvData = await fetchData();
+                console.log('CSV Data:', csvData);
+                
+                const rows = csvData.split('\n').slice(1);
+                console.log('CSV Rows:', rows);
+                
+                let usernames = [];
+                let doorCounts = [];
+                rows.forEach(row => {
+                    const columns = row.split(',');
+                    const username = columns[0];
+                    const door = parseInt(columns[3]);
+                    console.log('Username:', username, 'Door:', door);
+                    if (!usernames.includes(username)) {
+                        usernames.push(username);
+                        doorCounts.push(door);
+                    } else {
+                        const index = usernames.indexOf(username);
+                        doorCounts[index] += door;
+                    }
+                });
+
+                console.log('Usernames:', usernames);
+                console.log('Door Counts:', doorCounts);
+
+                const ctx = document.getElementById('userDoorChart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: usernames,
+                        datasets: [{
+                            label: 'Number of Times Door is Opened',
+                            data: doorCounts,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        createChart();
+    </script>
+</body>
+</html>
